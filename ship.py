@@ -128,19 +128,36 @@ class Ship:
             throttle_inputs.append((self.left_thruster, 1.0))
         if keys[pygame.K_d]:
             throttle_inputs.append((self.right_thruster, 1.0))
-        # Contrôles de rotation manuelle
+        # Activer les propulseurs de rotation
         if keys[pygame.K_LEFT]:
-            self.angular_velocity -= ROTATION_SPEED  # Utilisation de la variable depuis settings.py
+            throttle_inputs.append((self.rotation_left_thruster1, 1.0))
+            throttle_inputs.append((self.rotation_left_thruster2, 1.0))
         if keys[pygame.K_RIGHT]:
-            self.angular_velocity += ROTATION_SPEED
+            throttle_inputs.append((self.rotation_right_thruster1, 1.0))
+            throttle_inputs.append((self.rotation_right_thruster2, 1.0))
         return throttle_inputs
 
     def initialize_thrusters(self):
+        # Propulseurs principaux
         self.main_thruster = Thruster("Principal", (0, 40), THRUSTER_FORCE_MAIN, 0)  # Propulseur arrière
         self.reverse_thruster = Thruster("Arrière", (0, -40), THRUSTER_FORCE_REVERSE, 180)  # Propulseur avant
         self.left_thruster = Thruster("Gauche", (-20, 0), THRUSTER_FORCE_LATERAL, 90)  # Propulseur gauche
         self.right_thruster = Thruster("Droite", (20, 0), THRUSTER_FORCE_LATERAL, -90)  # Propulseur droit
+
+        # Propulseurs de rotation gauche (font tourner le vaisseau vers la gauche)
+        self.rotation_left_thruster1 = Thruster("Rotation Gauche 1", (20, -40), THRUSTER_FORCE_ROTATION, -90)
+        self.rotation_left_thruster2 = Thruster("Rotation Gauche 2", (-20, 40), THRUSTER_FORCE_ROTATION, 90)
+
+        # Propulseurs de rotation droite (font tourner le vaisseau vers la droite)
+        self.rotation_right_thruster1 = Thruster("Rotation Droite 1", (-20, -40), THRUSTER_FORCE_ROTATION, 90)
+        self.rotation_right_thruster2 = Thruster("Rotation Droite 2", (20, 40), THRUSTER_FORCE_ROTATION, -90)
+
+        # Ajouter tous les propulseurs
         self.add_thruster(self.main_thruster)
         self.add_thruster(self.reverse_thruster)
         self.add_thruster(self.left_thruster)
         self.add_thruster(self.right_thruster)
+        self.add_thruster(self.rotation_left_thruster1)
+        self.add_thruster(self.rotation_left_thruster2)
+        self.add_thruster(self.rotation_right_thruster1)
+        self.add_thruster(self.rotation_right_thruster2)
