@@ -20,10 +20,10 @@ FONT = pygame.font.SysFont('Arial', 18)
 # Paramètres du vaisseau et des propulseurs
 SHIP_MASS = 800
 LINEAR_DAMPING = 0.02
-THRUSTER_FORCE_MAIN = 4000
-THRUSTER_FORCE_REVERSE = 2500
-THRUSTER_FORCE_LATERAL = 2000
-THRUSTER_FORCE_ROTATION = 1500  # Force des propulseurs de rotation
+THRUSTER_FORCE_MAIN = 15000
+THRUSTER_FORCE_REVERSE = 7500
+THRUSTER_FORCE_LATERAL = 5000
+THRUSTER_FORCE_ROTATION = 3000  # Force des propulseurs de rotation
 
 # Paramètres du laser
 LASER_SPEED = 500  # Vitesse du laser en unités par seconde

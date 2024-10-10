@@ -4,6 +4,7 @@ import pygame
 from settings import *
 from .thruster import Thruster
 from .laser import Laser
+from .ship_part import ShipPart
 
 class Ship:
     def __init__(self, x, y):
@@ -12,7 +13,7 @@ class Ship:
         self.mass = SHIP_MASS
         self.linear_damping = LINEAR_DAMPING
         self.thrusters = []
-        self.ship_width, self.ship_height = 40, 80
+        self.parts = []  # Liste des parties du vaisseau
         self.active_thrusters = set()
         self.angle = 0  # Angle du vaisseau en degrés
         self.angular_velocity = 0  # Vitesse angulaire en degrés par seconde
@@ -23,10 +24,14 @@ class Ship:
         self.laser_cooldown = 0.2  # Temps entre les tirs en secondes
         self.laser_timer = 0  # Timer pour le tir du laser
 
+        self.initialize_parts()
         self.initialize_thrusters()
 
     def add_thruster(self, thruster):
         self.thrusters.append(thruster)
+
+    def add_part(self, part):
+        self.parts.append(part)
 
     def apply_thrusters(self, throttle_inputs, dt):
         total_force = pygame.math.Vector2(0, 0)
@@ -81,24 +86,9 @@ class Ship:
             self.laser_timer -= dt
 
     def draw(self, surface, camera_offset):
-        # Créer une surface pour le vaisseau
-        ship_surf = pygame.Surface((self.ship_width, self.ship_height), pygame.SRCALPHA)
-        pygame.draw.polygon(ship_surf, WHITE, [
-            (self.ship_width / 2, 0),
-            (0, self.ship_height),
-            (self.ship_width, self.ship_height)
-        ])
-
-        # Faire pivoter la surface du vaisseau
-        rotated_ship_surf = pygame.transform.rotate(ship_surf, -self.angle)
-        rotated_ship_rect = rotated_ship_surf.get_rect(center=self.position - camera_offset)
-
-        # Dessiner le vaisseau
-        surface.blit(rotated_ship_surf, rotated_ship_rect)
-
-        # Dessiner les thrusters
-        for thruster in self.thrusters:
-            thruster.draw(surface, self.position - camera_offset, self.angle)
+        # Dessiner les parties du vaisseau
+        for part in self.parts:
+            part.draw(surface, self.position - camera_offset, self.angle)
 
     def draw_info(self, surface):
         y_offset = 10
@@ -154,22 +144,144 @@ class Ship:
         else:
             return None
 
+    def initialize_parts(self):
+        # Coque du vaisseau
+        hull_shape = [
+            pygame.math.Vector2(0, -40),   # Pointe avant
+            pygame.math.Vector2(-20, 40),  # Coin arrière gauche
+            pygame.math.Vector2(20, 40)    # Coin arrière droit
+        ]
+        hull = ShipPart("Coque", (0, 0), shape=hull_shape, color=WHITE)
+        self.add_part(hull)
+
+        # Cockpit du vaisseau
+        cockpit_shape = [
+            pygame.math.Vector2(-10, -20),
+            pygame.math.Vector2(-10, -10),
+            pygame.math.Vector2(10, -10),
+            pygame.math.Vector2(10, -20)
+        ]
+        cockpit = ShipPart("Cockpit", (0, 0), shape=cockpit_shape, color=(0, 255, 255))
+        self.add_part(cockpit)
+
+        # Réacteurs du vaisseau (déjà inclus via les thrusters)
+
     def initialize_thrusters(self):
-        # Propulseurs principaux
-        self.main_thruster = Thruster("Principal", (0, 40), THRUSTER_FORCE_MAIN, 0)  # Propulseur arrière
-        self.reverse_thruster = Thruster("Arrière", (0, -40), THRUSTER_FORCE_REVERSE, 180)  # Propulseur avant
-        self.left_thruster = Thruster("Gauche", (-20, 0), THRUSTER_FORCE_LATERAL, 90)  # Propulseur gauche
-        self.right_thruster = Thruster("Droite", (20, 0), THRUSTER_FORCE_LATERAL, -90)  # Propulseur droit
+        # Création des ShipParts pour les thrusters
+        thruster_size = (10, 20)
+        thruster_color = (255, 165, 0)  # Orange
 
-        # Propulseurs de rotation gauche (font tourner le vaisseau vers la gauche)
-        self.rotation_left_thruster1 = Thruster("Rotation Gauche 1", (20, -40), THRUSTER_FORCE_ROTATION, -90)
-        self.rotation_left_thruster2 = Thruster("Rotation Gauche 2", (-20, 40), THRUSTER_FORCE_ROTATION, 90)
+        # Propulseur principal (arrière)
+        main_thruster_part = ShipPart(
+            "Thruster Principal",
+            (0, 40),
+            shape=[
+                pygame.math.Vector2(-5, 0),
+                pygame.math.Vector2(5, 0),
+                pygame.math.Vector2(5, -20),
+                pygame.math.Vector2(-5, -20)
+            ],
+            color=thruster_color
+        )
+        self.add_part(main_thruster_part)
 
-        # Propulseurs de rotation droite (font tourner le vaisseau vers la droite)
-        self.rotation_right_thruster1 = Thruster("Rotation Droite 1", (-20, -40), THRUSTER_FORCE_ROTATION, 90)
-        self.rotation_right_thruster2 = Thruster("Rotation Droite 2", (20, 40), THRUSTER_FORCE_ROTATION, -90)
+        # Propulseur arrière (avant)
+        reverse_thruster_part = ShipPart(
+            "Thruster Arrière",
+            (0, -40),
+            shape=[
+                pygame.math.Vector2(-5, 0),
+                pygame.math.Vector2(5, 0),
+                pygame.math.Vector2(5, 20),
+                pygame.math.Vector2(-5, 20)
+            ],
+            color=thruster_color
+        )
+        self.add_part(reverse_thruster_part)
 
-        # Ajouter tous les propulseurs
+        # Propulseur gauche (latéral)
+        left_thruster_part = ShipPart(
+            "Thruster Gauche",
+            (-20, 0),
+            shape=[
+                pygame.math.Vector2(0, -5),
+                pygame.math.Vector2(0, 5),
+                pygame.math.Vector2(20, 5),
+                pygame.math.Vector2(20, -5)
+            ],
+            color=thruster_color
+        )
+        self.add_part(left_thruster_part)
+
+        # Propulseur droit (latéral)
+        right_thruster_part = ShipPart(
+            "Thruster Droit",
+            (20, 0),
+            shape=[
+                pygame.math.Vector2(0, -5),
+                pygame.math.Vector2(0, 5),
+                pygame.math.Vector2(-20, 5),
+                pygame.math.Vector2(-20, -5)
+            ],
+            color=thruster_color
+        )
+        self.add_part(right_thruster_part)
+
+        # Propulseurs de rotation
+        rotation_thruster_shape = [
+            pygame.math.Vector2(-5, -5),
+            pygame.math.Vector2(5, -5),
+            pygame.math.Vector2(5, 5),
+            pygame.math.Vector2(-5, 5)
+        ]
+
+        rotation_left_thruster_part1 = ShipPart(
+            "Rotation Gauche Thruster 1",
+            (20, -40),
+            shape=rotation_thruster_shape,
+            color=thruster_color
+        )
+        rotation_left_thruster_part2 = ShipPart(
+            "Rotation Gauche Thruster 2",
+            (-20, 40),
+            shape=rotation_thruster_shape,
+            color=thruster_color
+        )
+        self.add_part(rotation_left_thruster_part1)
+        self.add_part(rotation_left_thruster_part2)
+
+        rotation_right_thruster_part1 = ShipPart(
+            "Rotation Droite Thruster 1",
+            (-20, -40),
+            shape=rotation_thruster_shape,
+            color=thruster_color
+        )
+        rotation_right_thruster_part2 = ShipPart(
+            "Rotation Droite Thruster 2",
+            (20, 40),
+            shape=rotation_thruster_shape,
+            color=thruster_color
+        )
+        self.add_part(rotation_right_thruster_part1)
+        self.add_part(rotation_right_thruster_part2)
+
+        # Création des Thrusters en les associant avec leurs ShipParts
+        self.main_thruster = Thruster("Principal", (0, 40), THRUSTER_FORCE_MAIN, 0, ship_part=main_thruster_part)
+        self.reverse_thruster = Thruster("Arrière", (0, -40), THRUSTER_FORCE_REVERSE, 180, ship_part=reverse_thruster_part)
+        self.left_thruster = Thruster("Gauche", (-20, 0), THRUSTER_FORCE_LATERAL, 90, ship_part=left_thruster_part)
+        self.right_thruster = Thruster("Droite", (20, 0), THRUSTER_FORCE_LATERAL, -90, ship_part=right_thruster_part)
+
+        self.rotation_left_thruster1 = Thruster(
+            "Rotation Gauche 1", (20, -40), THRUSTER_FORCE_ROTATION, -90, ship_part=rotation_left_thruster_part1)
+        self.rotation_left_thruster2 = Thruster(
+            "Rotation Gauche 2", (-20, 40), THRUSTER_FORCE_ROTATION, 90, ship_part=rotation_left_thruster_part2)
+
+        self.rotation_right_thruster1 = Thruster(
+            "Rotation Droite 1", (-20, -40), THRUSTER_FORCE_ROTATION, 90, ship_part=rotation_right_thruster_part1)
+        self.rotation_right_thruster2 = Thruster(
+            "Rotation Droite 2", (20, 40), THRUSTER_FORCE_ROTATION, -90, ship_part=rotation_right_thruster_part2)
+
+        # Ajouter tous les thrusters à la liste
         self.add_thruster(self.main_thruster)
         self.add_thruster(self.reverse_thruster)
         self.add_thruster(self.left_thruster)
