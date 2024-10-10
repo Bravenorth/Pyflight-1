@@ -1,9 +1,9 @@
-# ship.py
+# game/ship.py
 
 import pygame
 from settings import *
-from thruster import Thruster
-from laser import Laser  # Importer la classe Laser
+from .thruster import Thruster
+from .laser import Laser
 
 class Ship:
     def __init__(self, x, y):

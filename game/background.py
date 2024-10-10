@@ -1,4 +1,4 @@
-# background.py
+# game/background.py
 
 import pygame
 import random

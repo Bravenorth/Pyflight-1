@@ -2,9 +2,8 @@
 
 import pygame
 from settings import *
-from ship import Ship
-from background import generate_stars, draw_background
-from laser import Laser  # Importer la classe Laser
+from game.ship import Ship
+from game.background import generate_stars, draw_background
 
 def main():
     pygame.init()
@@ -17,7 +16,7 @@ def main():
 
     run = True
     ship = Ship(MAP_WIDTH // 2, MAP_HEIGHT // 2)
-    lasers = []  # Liste pour stocker les lasers
+    lasers = []  # Liste pour stocker les lasers actifs
 
     while run:
         dt = clock.tick(FRAME_RATE) / 1000  # Durée d'une frame en secondes

@@ -1,4 +1,4 @@
-# laser.py
+# game/laser.py
 
 import pygame
 import math

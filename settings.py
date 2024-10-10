@@ -10,7 +10,7 @@ WINDOW_TITLE = "Simulation de Vaisseau"
 # Couleurs
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-THRUSTER_ACTIVE_COLOR = (255, 0, 0)   # Rouge
+THRUSTER_ACTIVE_COLOR = (255, 0, 0)    # Rouge
 THRUSTER_INACTIVE_COLOR = (0, 255, 0)  # Vert
 
 # Police pour l'affichage du texte
