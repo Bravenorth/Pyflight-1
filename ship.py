@@ -3,6 +3,7 @@
 import pygame
 from settings import *
 from thruster import Thruster
+from laser import Laser  # Importer la classe Laser
 
 class Ship:
     def __init__(self, x, y):
@@ -17,6 +18,10 @@ class Ship:
         self.angular_velocity = 0  # Vitesse angulaire en degrés par seconde
         self.angular_damping = 0.05  # Facteur d'amortissement angulaire
         self.moment_of_inertia = 5000  # Moment d'inertie du vaisseau
+
+        # Variables pour la gestion du tir
+        self.laser_cooldown = 0.2  # Temps entre les tirs en secondes
+        self.laser_timer = 0  # Timer pour le tir du laser
 
         self.initialize_thrusters()
 
@@ -70,6 +75,10 @@ class Ship:
         # Limiter la position du vaisseau aux limites de la carte
         self.position.x = max(0, min(self.position.x, MAP_WIDTH))
         self.position.y = max(0, min(self.position.y, MAP_HEIGHT))
+
+        # Mettre à jour le timer du laser
+        if self.laser_timer > 0:
+            self.laser_timer -= dt
 
     def draw(self, surface, camera_offset):
         # Créer une surface pour le vaisseau
@@ -136,6 +145,14 @@ class Ship:
             throttle_inputs.append((self.rotation_right_thruster1, 1.0))
             throttle_inputs.append((self.rotation_right_thruster2, 1.0))
         return throttle_inputs
+
+    def fire_laser(self):
+        if self.laser_timer <= 0:
+            self.laser_timer = self.laser_cooldown
+            # Créer un nouveau laser à la position et à l'angle du vaisseau
+            return Laser(self.position, self.angle)
+        else:
+            return None
 
     def initialize_thrusters(self):
         # Propulseurs principaux

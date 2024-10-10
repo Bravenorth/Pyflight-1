@@ -11,11 +11,11 @@ WINDOW_TITLE = "Simulation de Vaisseau"
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 THRUSTER_ACTIVE_COLOR = (255, 0, 0)   # Rouge
-THRUSTER_INACTIVE_COLOR = (0, 255, 0) # Vert
+THRUSTER_INACTIVE_COLOR = (0, 255, 0)  # Vert
 
 # Police pour l'affichage du texte
 pygame.font.init()
-FONT = pygame.font.SysFont('Arial', 14)
+FONT = pygame.font.SysFont('Arial', 18)
 
 # Paramètres du vaisseau et des propulseurs
 SHIP_MASS = 800
@@ -24,6 +24,10 @@ THRUSTER_FORCE_MAIN = 4000
 THRUSTER_FORCE_REVERSE = 2500
 THRUSTER_FORCE_LATERAL = 2000
 THRUSTER_FORCE_ROTATION = 1500  # Force des propulseurs de rotation
+
+# Paramètres du laser
+LASER_SPEED = 500  # Vitesse du laser en unités par seconde
+LASER_LIFETIME = 2  # Durée de vie du laser en secondes
 
 # Paramètres de la carte
 MAP_WIDTH, MAP_HEIGHT = 5000, 5000

@@ -2,7 +2,7 @@
 
 import pygame
 import math
-from settings import THRUSTER_ACTIVE_COLOR, THRUSTER_INACTIVE_COLOR
+from settings import THRUSTER_ACTIVE_COLOR, THRUSTER_INACTIVE_COLOR, BLACK
 
 class Thruster:
     def __init__(self, name, relative_pos, max_force, direction):
